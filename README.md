@@ -21,5 +21,7 @@ People tend to write boilerplate code to deal with configuration of applications
 	val properties = FilePathProperties(FilePath(HomeDir(), "propertyDirectory" :: "myproperties.properties" :: Nil))
 	val myPropertyValue = properties("somePropertyKey")
 	
+If you look at the constructors of the various Property classes, you can customize the defaults based on personal preference, but we provide a few sensible default values through Scalas default arguments.
+	
 ## Roadmap
 There is no roadmap in particular: SConfig will not be loaded with lots of features, as the basics are easy enough to wrap in your own code. It only supports properties files because, well, XML configs etc are just a mess. SConfig does very little and doesn't intend to do much more in the future.
