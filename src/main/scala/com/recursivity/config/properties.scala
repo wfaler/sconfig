@@ -5,16 +5,15 @@ import java.util.Properties
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: wfaler
- * Date: 12/02/2012
- * Time: 11:30
- * To change this template use File | Settings | File Templates.
+ * Resolves properties from the classpath based on a environment variable, such as a variable in a .profile file or EXPORT.
+ * @param varName  the environment variable used to resolve the properties file
+ * @param default default for the above property if no environment variable is found, defaults to None
+ * @param configLocation  location of properties file. Defaults to "/config/", but can be changed. Can also be given a filename prefix for specific properties files, for instance "/config/database_" to resolve to "/config/database_prod.properties" given a environment variable value of "prod"
+ *
  */
-
-case class EnvironmentProperties(varName: String, default: Option[String] = None, configDir: String = "/config/") extends Config{
+case class EnvironmentProperties(varName: String, default: Option[String] = None, configLocation: String = "/config/") extends Config{
   val props = PropertiesLoader(() => {
-    this.getClass.getResourceAsStream(configDir + {
+    this.getClass.getResourceAsStream(configLocation + {
       if(System.getenv(varName) != null) System.getenv(varName) + ".properties"
       else default.getOrElse("") + ".properties"
     })
@@ -22,6 +21,10 @@ case class EnvironmentProperties(varName: String, default: Option[String] = None
   def apply(key: String) = getProperty(key)
 }
 
+/**
+ * Loads a properties file from the classpath in the location of [Class fully qualified name].properties,
+ * traverses parent classes if no properties file exists.
+ */
 case class ContextProperties(cls: Class[_]) extends Config{
   val props = PropertiesLoader(() => traverseClassInheritance(cls))
   def apply(key: String) = getProperty(key)
@@ -33,13 +36,23 @@ case class ContextProperties(cls: Class[_]) extends Config{
   }
 }
 
+/**
+ * Resolves properties from the given file system location
+ */
 case class FilePathProperties(path: String) extends Config{
   val props = PropertiesLoader(() => {new FileInputStream(path)})
   def apply(key: String) = getProperty(key)
 }
 
-case class SystemProperties(property: String, default: Option[String] = None, configDir: String = "/config/") extends Config{
-  val props = PropertiesLoader(() => this.getClass.getResourceAsStream(configDir + System.getProperty(property, default.getOrElse("")) + ".properties"))
+/**
+ * Resolves properties from the classpath based on a system property, such as a -D provided property during JVM startup.
+ * @param property  the system property used to resolve the properties file
+ * @param default default for the above property if no system property is found, defaults to None
+ * @param configLocation  location of properties file. Defaults to "/config/", but can be changed. Can also be given a filename prefix for specific properties files, for instance "/config/database_" to resolve to "/config/database_prod.properties" given a system property value of "prod"
+ *
+ */
+case class SystemProperties(property: String, default: Option[String] = None, configLocation: String = "/config/") extends Config{
+  val props = PropertiesLoader(() => this.getClass.getResourceAsStream(configLocation + System.getProperty(property, default.getOrElse("")) + ".properties"))
   def apply(key: String) = getProperty(key)
 }
 
