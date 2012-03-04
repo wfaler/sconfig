@@ -27,8 +27,23 @@ class PropertiesSpec extends Specification{  def is =
       "Resolve the right property for a concrete class with properties" ! propertiesForClass^
       "Traverse the classpath inheritance upwards to resolve properties if none exist for the given class" ! propertiesForParentClass^
       "Throw an Exception if no properties are found" ! noPropertiesForAnyClass^
-                                                end
+                                                endp^
+    "Placeholder properties should" ^
+      "Be replaced properly if multiple exist in a property value" ! placeholderReplacement^
+      "Fallback to system properties and environment if not present in property file" ! systemPlaceholder^
+      end
 
+
+  def placeholderReplacement = {
+    System.setProperty("sconfig", "default")
+    (SystemProperties("sconfig")("replacer") must be_==("Howdy how are the kids?"))
+  }
+
+  def systemPlaceholder = {
+    System.setProperty("sconfig", "default")
+    System.setProperty("myHost", "http://localhost")
+    (SystemProperties("sconfig")("replace2") must be_==("http://localhost/someUri"))
+  }
 
   def existingFileProperties = {
     FilePathProperties(FilePath("src" :: "test" :: "resources" :: "config" :: "default.properties" :: Nil))("myProp") must be_==("default")

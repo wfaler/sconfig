@@ -2,6 +2,7 @@ package com.recursivity.config
 
 import java.io.{InputStream, FileInputStream}
 import java.util.Properties
+import java.text.MessageFormat
 
 
 /**
@@ -60,7 +61,22 @@ trait Config{
   def props: Properties
   
   def getProperty(key: String): String = {
-    if(props.getProperty(key) == null) throw new IllegalArgumentException("no property " + key + "in properties loaded with " + this.getClass.getName + "!")
-    else props.getProperty(key)
+    if(props.get(key) == null) throw new IllegalArgumentException("no property " + key + "in properties loaded with " + this.getClass.getName + "!")
+    else replacePlaceholders(props.get(key).toString)
+  }
+  
+  private def replacePlaceholders(value: String): String = {
+    val startIndex = value.indexOf("${") + 2
+    val endIndex = value.substring(startIndex).indexOf("}") + startIndex
+    if(startIndex > -1 && endIndex > startIndex){
+      val key = value.substring(startIndex, endIndex)
+      replacePlaceholders(value.replace("${" + key + "}", {
+        try{
+          getProperty(key)
+        }catch{
+          case e: IllegalArgumentException => System.getProperty(key, System.getenv(key))
+        }  
+      }))
+    }else value
   }
 }
