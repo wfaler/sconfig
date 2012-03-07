@@ -38,6 +38,15 @@ case class ContextProperties(cls: Class[_]) extends Config{
 }
 
 /**
+ * Resolves properties based classpath, such as /com/recursivity/myConfig.properties
+ * @param path
+ */
+case class ClasspathProperties(path: String) extends Config{
+  val props = PropertiesLoader(() => this.getClass.getResourceAsStream({if(!path.startsWith("/")) "/" + path;else path}))
+  def apply(key: String) = getProperty(key)
+}
+
+/**
  * Resolves properties from the given file system location
  */
 case class FilePathProperties(path: String) extends Config{
@@ -54,6 +63,28 @@ case class FilePathProperties(path: String) extends Config{
  */
 case class SystemProperties(property: String, default: Option[String] = None, configLocation: String = "/config/") extends Config{
   val props = PropertiesLoader(() => this.getClass.getResourceAsStream(configLocation + System.getProperty(property, default.getOrElse("")) + ".properties"))
+  def apply(key: String) = getProperty(key)
+}
+
+
+/**
+ * Loads and concatenates properties hierarchically, last in list take precedence if duplicates exist.
+ * @param properties
+ */
+case class PropertyGroupProperties(properties: List[Config]) extends Config{
+
+  val props = {
+    val local = new Properties()
+    properties.foreach(config => {
+      val iterator = config.props.keySet().iterator()
+      while(iterator.hasNext){
+        val key = iterator.next()
+        local.put(key, config.props.get(key))
+      }
+    })
+    local
+  }
+
   def apply(key: String) = getProperty(key)
 }
 

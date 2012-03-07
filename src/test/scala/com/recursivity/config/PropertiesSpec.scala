@@ -17,6 +17,12 @@ class PropertiesSpec extends Specification{  def is =
       "Find a file with a given name that exists" ! existingFileProperties^
       "Throw an Exception if the file does not exist" ! fileNotFound^
                                                 endp^
+    "The ClasspathProperties should" ^
+      "Find the properties on the classpath"   ! classpathProperties^
+                                                endp^
+    "The PropertyGroupProperties should" ^
+      "Replace the placeholder with the correct replacement"   ! propertyGroup^
+                                                endp^
     "The SystemProperties should" ^
       "Resolve the right property" ! envResolve^
       "Fallback on the given default properties" ! defaultProps^
@@ -51,6 +57,14 @@ class PropertiesSpec extends Specification{  def is =
 
   def fileNotFound = {
     FilePathProperties(FilePath("src" :: "test" :: "resources" :: "config" :: "blabla.properties" :: Nil)) must throwAn[Exception]
+  }
+
+  def classpathProperties = {
+    ClasspathProperties("/config/default.properties")("replacer") must be_==("Howdy how are the kids?")
+  }
+
+  def propertyGroup = {
+    PropertyGroupProperties(ClasspathProperties("/config/default.properties") :: ClasspathProperties("/config/prod.properties") :: Nil)("replacer") must be_==("Hiya how are the kids?")
   }
 
   def envResolve = {
