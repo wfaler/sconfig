@@ -4,7 +4,7 @@ version := "1.0-SNAPSHOT"
 
 organization := "com.recursivity"
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.3"
 
 
 resolvers ++= Seq("Sonatype Nexus releases" at "https://oss.sonatype.org/content/repositories/releases", 
@@ -12,5 +12,5 @@ resolvers ++= Seq("Sonatype Nexus releases" at "https://oss.sonatype.org/content
 	"object web" at "http://maven.ow2.org/maven2/", "novus" at "http://repo.novus.com/snapshots/")
 
 libraryDependencies ++= Seq(
-	"org.specs2" %% "specs2" % "1.14" % "test"
+	"org.specs2" %% "specs2" % "2.3.7" % "test"
 	)
