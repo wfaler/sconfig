@@ -95,6 +95,19 @@ trait Config{
     if(props.get(key) == null) throw new IllegalArgumentException("no property " + key + "in properties loaded with " + this.getClass.getName + "!")
     else replacePlaceholders(props.get(key).toString)
   }
+
+  def getString(key: String): Option[String] = {
+    try{
+      Some(getProperty(key))
+    }catch{
+      case e: IllegalArgumentException => None
+    }
+  }
+
+  def getInt(key: String): Option[Int] = getString(key) map{_.toInt}
+  def getLong(key: String): Option[Long] = getString(key) map{_.toLong}
+  def getDouble(key: String): Option[Double] = getString(key) map{_.toDouble}
+  def getBoolean(key: String): Option[Boolean] = getString(key) map{_.toBoolean}
   
   private def replacePlaceholders(value: String): String = {
     val startIndex = value.indexOf("${") + 2
