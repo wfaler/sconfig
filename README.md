@@ -32,3 +32,4 @@ In this case, ${host} would be replaced in order of preference by a property nam
 	
 ## Roadmap
 There is no roadmap in particular: SConfig will not be loaded with lots of features, as the basics are easy enough to wrap in your own code. It only supports properties files because, well, XML configs etc are just a mess. SConfig does very little and doesn't intend to do much more in the future.
+
