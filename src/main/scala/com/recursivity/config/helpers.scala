@@ -28,9 +28,14 @@ object FilePath{
 object PropertiesLoader{
   def apply(inputStreamLoader: () => InputStream): Properties = {
     val props = new Properties
-    val in = inputStreamLoader()
-    props.load(in)
-    in.close
-    props
+    try{
+      val in = inputStreamLoader()
+      props.load(in)
+      in.close
+      props
+    }catch{
+      case e: Exception => e.printStackTrace(); throw e
+    }
+    
   }
 }
